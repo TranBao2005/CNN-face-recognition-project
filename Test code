@@ -1,0 +1,45 @@
+from keras.models import load_model
+from keras.utils import load_img
+import numpy as np
+import matplotlib.pyplot as plt
+import json
+
+model = load_model("face_recognition.keras")
+
+with open("class_names.json", "r") as f:
+    class_indices = json.load(f)
+
+class_labels = {
+    v:k
+    for k,v in class_indices.items()
+}
+
+image_path = "/content/z7847490624735_bbf368326a54226c65163f19e29843d7.jpg"
+
+img = load_img(
+    image_path,
+    target_size=(128,128)
+)
+
+plt.imshow(img)
+plt.axis("off")
+plt.show()
+
+img_array = np.array(img)
+
+img_array = img_array.astype("float32") / 255.0
+
+img_array = np.expand_dims(
+    img_array,
+    axis=0
+)
+
+prediction = model.predict(img_array)
+
+predicted_class = np.argmax(prediction)
+
+predicted_name = class_labels[predicted_class]
+
+confidence = np.max(prediction) * 100
+
+print("Người dự đoán:", predicted_name)
